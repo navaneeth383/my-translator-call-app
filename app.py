@@ -1,38 +1,31 @@
 import streamlit as st
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 from gtts import gTTS
 import tempfile
-import os
 
 st.set_page_config(page_title="Telugu ↔ English Call Translator", layout="centered")
 
 st.title("📞 Live Call Translator – Telugu ↔ English")
-st.markdown("This is a **simulated bilingual translator** for Telugu and English voice calls.")
-st.markdown("ℹ️ Real phone calls are not supported, but speech translation is!")
+st.markdown("Simulated call translator between **Telugu and English**")
+st.markdown("⚠️ Real phone/mic calls not supported (text + audio only)")
 
-translator = Translator()
-
-def translate_and_speak(text, src_lang, dest_lang):
-    # Translate
-    translation = translator.translate(text, src=src_lang, dest=dest_lang).text
-    st.write(f"🔄 Translated to `{dest_lang}`: {translation}")
-
-    # Speak
-    tts = gTTS(text=translation, lang=dest_lang)
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-        tts.save(fp.name)
-        st.audio(fp.name, format="audio/mp3")
-        return translation
+def translate_and_speak(text, source, target):
+    translation = GoogleTranslator(source=source, target=target).translate(text)
+    st.write(f"🔄 Translated to `{target}`: {translation}")
+    tts = gTTS(translation, lang=target)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
+        tts.save(f.name)
+        st.audio(f.name, format="audio/mp3")
 
 st.header("👤 Telugu Speaker")
 telugu_text = st.text_input("Speak (or type) in Telugu:")
 if telugu_text:
-    translate_and_speak(telugu_text, src_lang="te", dest_lang="en")
+    translate_and_speak(telugu_text, source='te', target='en')
 
 st.header("👤 English Speaker")
 english_text = st.text_input("Speak (or type) in English:")
 if english_text:
-    translate_and_speak(english_text, src_lang="en", dest_lang="te")
+    translate_and_speak(english_text, source='en', target='te')
 
 st.markdown("---")
 st.markdown("👨‍💻 Developed by **Gattu Navaneeth Rao**")
